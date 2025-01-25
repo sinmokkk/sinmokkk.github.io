@@ -24,15 +24,17 @@
 
     .contain {
       z-index: 10;
-      width: 650px;
-      height: 400px;
-      background: rgba(0, 0, 0, 0.3); /* 半透明背景 */
-      border: 2px solid rgba(255, 255, 255, 0.2); /* 淡白色邊框 */
+      width: 90%;
+      max-width: 650px;
+      height: auto;
+      aspect-ratio: 16 / 9;
+      background: rgba(0, 0, 0, 0.3);
+      border: 2px solid rgba(255, 255, 255, 0.2);
       border-radius: 1rem;
       box-shadow: 
         0 4px 10px rgba(0, 0, 0, 0.7), 
-        inset 0 0 30px rgba(255, 255, 255, 0.1); /* 內陰影模仿玻璃效果 */
-      backdrop-filter: blur(10px); /* 背景模糊效果 */
+        inset 0 0 30px rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
       position: relative;
       display: flex;
       justify-content: center;
@@ -43,13 +45,13 @@
     .screen {
       width: 95%;
       height: 85%;
-      background: rgba(0, 0, 0, 0.5); /* 更深層的半透明背景 */
+      background: rgba(0, 0, 0, 0.5);
       border-radius: 0.75rem;
       overflow: hidden;
       position: relative;
       box-shadow: 
-        inset 0 0 10px rgba(255, 255, 255, 0.3), /* 模仿螢幕玻璃內部反光 */
-        inset 0 0 30px rgba(0, 0, 0, 0.7); /* 深色內陰影 */
+        inset 0 0 10px rgba(255, 255, 255, 0.3), 
+        inset 0 0 30px rgba(0, 0, 0, 0.7);
     }
 
     .screen iframe {
@@ -121,7 +123,7 @@
       left: 50%;
       transform: translate(-50%, -50%) scale(1);
       color: #00ccff;
-      font-size: 5rem;
+      font-size: 5vw;
       font-weight: bold;
       text-shadow: 
         0 0 10px #00ccff, 
@@ -182,6 +184,19 @@
         filter: brightness(1.4);
       }
     }
+
+    /* 響應式設計 */
+    @media (max-width: 768px) {
+      .nmixx-text {
+        font-size: 8vw;
+      }
+
+      .contain {
+        width: 90%;
+        height: auto;
+        aspect-ratio: 16 / 9;
+      }
+    }
   </style>
 </head>
 <body>
@@ -217,15 +232,15 @@
       bubble.classList.add('bubble');
 
       // 隨機設定 x 軸位置
-      const randomX = Math.random() * 100; // 0% 到 100%
+      const randomX = Math.random() * 100;
       bubble.style.left = `${randomX}%`;
 
       // 隨機設定動畫持續時間
-      const randomDuration = 6 + Math.random() * 4; // 6s 到 10s
+      const randomDuration = 6 + Math.random() * 4;
       bubble.style.animationDuration = `${randomDuration}s`;
 
       // 隨機設定大小
-      const randomSize = 20 + Math.random() * 30; // 20px 到 50px
+      const randomSize = 20 + Math.random() * 30;
       bubble.style.width = `${randomSize}px`;
       bubble.style.height = `${randomSize}px`;
 
@@ -236,7 +251,7 @@
     const staticNoise = document.querySelector('.static-noise');
     setTimeout(() => {
       staticNoise.classList.add('fade-out');
-    }, 2000); // 雜訊持續 2 秒後淡出
+    }, 2000);
   </script>
 </body>
 </html>

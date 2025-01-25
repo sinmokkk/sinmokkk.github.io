@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Random Bubbles with Lighting Effect</title>
+  <title>NMIXX</title>
   <style>
     body {
       margin: 0;
@@ -24,12 +24,130 @@
 
     .contain {
       z-index: 10;
-      width: 600px;
-      padding: 100px;
-      background-color: rgba(0, 0, 0, 0.5);
-      border-radius: 0.75rem;
+      width: 650px;
+      height: 400px;
+      background: rgba(0, 0, 0, 0.3); /* 半透明背景 */
+      border: 2px solid rgba(255, 255, 255, 0.2); /* 淡白色邊框 */
+      border-radius: 1rem;
+      box-shadow: 
+        0 4px 10px rgba(0, 0, 0, 0.7), 
+        inset 0 0 30px rgba(255, 255, 255, 0.1); /* 內陰影模仿玻璃效果 */
+      backdrop-filter: blur(10px); /* 背景模糊效果 */
+      position: relative;
       display: flex;
       justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .screen {
+      width: 95%;
+      height: 85%;
+      background: rgba(0, 0, 0, 0.5); /* 更深層的半透明背景 */
+      border-radius: 0.75rem;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 
+        inset 0 0 10px rgba(255, 255, 255, 0.3), /* 模仿螢幕玻璃內部反光 */
+        inset 0 0 30px rgba(0, 0, 0, 0.7); /* 深色內陰影 */
+    }
+
+    .screen iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .reflection {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
+      mix-blend-mode: overlay;
+      pointer-events: none;
+      border-radius: 0.75rem;
+    }
+
+    /* 雜訊層 */
+    .static-noise {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: black;
+      z-index: 1000;
+      pointer-events: none;
+      animation: noise 0.2s infinite;
+    }
+
+    @keyframes noise {
+      0%, 100% {
+        background: repeating-linear-gradient(
+          0deg,
+          rgba(0, 0, 0, 0.9) 0px,
+          rgba(255, 255, 255, 0.05) 2px,
+          rgba(0, 0, 0, 0.9) 4px
+        );
+      }
+      50% {
+        background: repeating-linear-gradient(
+          90deg,
+          rgba(0, 0, 0, 0.9) 0px,
+          rgba(255, 255, 255, 0.05) 3px,
+          rgba(0, 0, 0, 0.9) 6px
+        );
+      }
+    }
+
+    /* 淡出效果 */
+    .fade-out {
+      animation: fadeOut 1s forwards;
+    }
+
+    @keyframes fadeOut {
+      to {
+        opacity: 0;
+        visibility: hidden;
+      }
+    }
+
+    /* 螢光字效果 */
+    .nmixx-text {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(1);
+      color: #00ccff;
+      font-size: 5rem;
+      font-weight: bold;
+      text-shadow: 
+        0 0 10px #00ccff, 
+        0 0 20px #00ccff, 
+        0 0 30px #00ccff,
+        0 0 40px #00ffff;
+      opacity: 0;
+      z-index: 1001;
+      animation: textEffect 2.5s forwards 2s;
+    }
+
+    @keyframes textEffect {
+      0% {
+        opacity: 0;
+        text-shadow: 0 0 10px #00ccff;
+        transform: translate(-50%, -50%) scale(0.8);
+      }
+      50% {
+        opacity: 1;
+        text-shadow: 0 0 30px #00ccff, 0 0 60px #00ffff;
+        transform: translate(-50%, -50%) scale(1.2);
+      }
+      100% {
+        text-shadow: 0 0 10px #00ccff, 0 0 20px #00ffff;
+        transform: translate(-50%, -50%) scale(1);
+      }
     }
 
     .bubble {
@@ -67,14 +185,24 @@
   </style>
 </head>
 <body>
+  <!-- 雜訊層 -->
+  <div class="static-noise"></div>
+
+  <!-- 螢光字 -->
+  <div class="nmixx-text">NMIXX</div>
+
   <div class="ocean">
     <div class="contain">
-        <iframe style="border-radius:0.75rem" 
-            src="https://open.spotify.com/embed/track/44zfpg3ndtGESsgpTbWeyE?utm_source=generator&theme=0" 
-            width="100%" height="352" frameBorder="0" allowfullscreen="" 
-            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-            loading="lazy">
-        </iframe>
+      <!-- 電視的屏幕部分 -->
+      <div class="screen">
+        <!-- <iframe 
+          src="https://www.youtube.com/embed/mgmgmQb-_RI" 
+          title="YouTube video player" 
+          allow="autoplay; clipboard-write; encrypted-media; picture-in-picture" 
+          allowfullscreen>
+        </iframe> -->
+        <div class="reflection"></div>
+      </div>
     </div>
   </div>
 
@@ -103,6 +231,12 @@
 
       ocean.appendChild(bubble);
     }
+
+    // 雜訊層動畫
+    const staticNoise = document.querySelector('.static-noise');
+    setTimeout(() => {
+      staticNoise.classList.add('fade-out');
+    }, 2000); // 雜訊持續 2 秒後淡出
   </script>
 </body>
 </html>

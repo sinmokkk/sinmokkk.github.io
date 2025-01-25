@@ -9,7 +9,7 @@
       margin: 0;
       padding: 0;
       overflow: hidden;
-      background: linear-gradient(to bottom, #003366, #001933);
+      background: linear-gradient(to bottom, #0050a1, #001933);
     }
 
     .ocean {
@@ -20,6 +20,7 @@
       height: 100vh;
       overflow: hidden;
       position: relative;
+      background: radial-gradient(circle, #00bfff, #0099cc 60%, #004c99 100%);
     }
 
     .contain {
@@ -155,15 +156,17 @@
       bottom: -100px;
       width: 40px;
       height: 40px;
-      background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.6) 40%, rgba(255, 255, 255, 0.1) 70%);
+      background: radial-gradient(circle at 30% 30%, rgba(0, 240, 255, 0.8), rgba(0, 180, 255, 0.6) 40%, rgba(0, 150, 255, 0.3) 70%);
       border-radius: 50%;
       box-shadow: 
-        0 0 15px 5px rgba(255, 255, 255, 0.5), 
-        inset -8px -8px 15px rgba(255, 255, 255, 0.8), 
-        inset 8px 8px 20px rgba(0, 0, 0, 0.2);
+        0 0 30px 10px rgba(0, 220, 255, 0.8), 
+        inset -10px -10px 20px rgba(0, 240, 255, 0.9), 
+        inset 10px 10px 25px rgba(0, 100, 200, 0.4);
       animation: rise 8s infinite ease-in-out, shine 3s infinite alternate;
-      opacity: 0.8; 
+      opacity: 0.9; /* 提高透明度讓它更亮 */
     }
+
+
 
     @keyframes rise {
       0% {

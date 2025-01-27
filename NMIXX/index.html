@@ -53,8 +53,8 @@
         inset 0 0 30px rgba(0, 0, 0, 0.7);
       display: flex;
       flex-direction: row;
-      scroll-behavior: smooth;
       overflow-x: auto;
+      scroll-snap-type: x mandatory; /* 啟用強制對齊 */
       scrollbar-width: none; /* 隱藏滾動條 */
     }
 
@@ -68,7 +68,7 @@
       flex: 0 0 100%;
       width: 100%;
       height: 100%;
-      position: relative;
+      scroll-snap-align: start; /* 對齊到容器的起始點 */
       text-align: center;
       color: #fff;
       font-size: 2rem;
@@ -385,7 +385,7 @@
   <div class="ocean">
     <div class="contain">
       <!-- 電視的屏幕部分 -->
-      <div class="screen" id="screen">
+      <div class="screen">
         <div class="page">Page 1</div>
         <div class="page">Page 2</div>
         <div class="page">Page 3</div>
@@ -393,33 +393,22 @@
 
       <!-- 左右導航按鈕 -->
       <div class="navigation">
-        <button class="nav-button nav-prev" id="prevBtn">&#8249;</button>
-        <button class="nav-button nav-next" id="nextBtn">&#8250;</button>
+        <button class="nav-button nav-prev" onclick="scrollScreen(-1)">&#8249;</button>
+        <button class="nav-button nav-next" onclick="scrollScreen(1)">&#8250;</button>
       </div>
     </div>
   </div>
 
   <script>
-    const screen = document.getElementById('screen');
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-
-    let currentPage = 0;
-
-    // 更新頁面視窗
-    function updatePage(offset) {
-      const pages = screen.children.length;
-      currentPage = Math.min(Math.max(currentPage + offset, 0), pages - 1);
+    function scrollScreen(direction) {
+      const screen = document.querySelector('.screen');
       const pageWidth = screen.offsetWidth;
-      screen.scrollTo({
-        left: currentPage * pageWidth,
+      screen.scrollBy({
+        left: direction * pageWidth,
         behavior: 'smooth',
       });
     }
 
-    // 按鈕點擊事件
-    prevBtn.addEventListener('click', () => updatePage(-1));
-    nextBtn.addEventListener('click', () => updatePage(1));
     // 設定泡泡數量
     const bubbleCount = 20;
     const ocean = document.querySelector('.ocean');

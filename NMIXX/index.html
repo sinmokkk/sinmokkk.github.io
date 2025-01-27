@@ -30,8 +30,8 @@
       background: rgba(0, 0, 0, 0.3);
       border: 2px solid rgba(255, 255, 255, 0.2);
       border-radius: 1rem;
-      box-shadow: 
-        0 4px 10px rgba(0, 0, 0, 0.7), 
+      box-shadow:
+        0 4px 10px rgba(0, 0, 0, 0.7),
         inset 0 0 30px rgba(255, 255, 255, 0.1);
       backdrop-filter: blur(10px);
       position: relative;
@@ -48,27 +48,78 @@
       border-radius: 0.75rem;
       overflow: hidden;
       position: relative;
-      box-shadow: 
+      box-shadow:
         inset 0 0 10px rgba(255, 255, 255, 0.3),
         inset 0 0 30px rgba(0, 0, 0, 0.7);
+      display: flex;
+      flex-direction: row;
+      scroll-behavior: smooth;
+      overflow-x: auto;
+      scrollbar-width: none; /* 隱藏滾動條 */
     }
 
-    .screen iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
+    .screen::-webkit-scrollbar {
+      display: none; /* 隱藏滾動條 */
     }
 
-    .reflection {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(145deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
-      mix-blend-mode: overlay;
-      pointer-events: none;
+    .page {
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.2));
       border-radius: 0.75rem;
+      flex: 0 0 100%;
+      width: 100%;
+      height: 100%;
+      position: relative;
+      text-align: center;
+      color: #fff;
+      font-size: 2rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .navigation {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      pointer-events: none;
+    }
+
+    .nav-button {
+      background: rgba(0, 0, 0, 0.5);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 1.5rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      pointer-events: all;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7);
+      transition: transform 0.2s ease;
+    }
+
+    .nav-button:hover {
+      transform: scale(1.1);
+    }
+
+    .nav-button:active {
+      transform: scale(1);
+    }
+
+    .nav-prev {
+      position: absolute;
+      left: 10px;
+    }
+
+    .nav-next {
+      position: absolute;
+      right: 10px;
     }
 
     /* 雜訊層 */
@@ -334,15 +385,41 @@
   <div class="ocean">
     <div class="contain">
       <!-- 電視的屏幕部分 -->
-      <div class="screen">
-        <div class="reflection">
+      <div class="screen" id="screen">
+        <div class="page">Page 1</div>
+        <div class="page">Page 2</div>
+        <div class="page">Page 3</div>
+      </div>
 
-        </div>
+      <!-- 左右導航按鈕 -->
+      <div class="navigation">
+        <button class="nav-button nav-prev" id="prevBtn">&#8249;</button>
+        <button class="nav-button nav-next" id="nextBtn">&#8250;</button>
       </div>
     </div>
   </div>
 
   <script>
+    const screen = document.getElementById('screen');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    let currentPage = 0;
+
+    // 更新頁面視窗
+    function updatePage(offset) {
+      const pages = screen.children.length;
+      currentPage = Math.min(Math.max(currentPage + offset, 0), pages - 1);
+      const pageWidth = screen.offsetWidth;
+      screen.scrollTo({
+        left: currentPage * pageWidth,
+        behavior: 'smooth',
+      });
+    }
+
+    // 按鈕點擊事件
+    prevBtn.addEventListener('click', () => updatePage(-1));
+    nextBtn.addEventListener('click', () => updatePage(1));
     // 設定泡泡數量
     const bubbleCount = 20;
     const ocean = document.querySelector('.ocean');

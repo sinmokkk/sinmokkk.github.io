@@ -285,7 +285,7 @@
         0 0 30px #00ccff,
         0 0 40px #00ffff;
       opacity: 0;
-      z-index: 1001;
+      z-index: 1000;
       animation: textEffect 2.5s forwards 5s;
     }
 
@@ -303,6 +303,7 @@
       100% {
         text-shadow: 0 0 10px #00ccff, 0 0 20px #00ffff;
         transform: translate(-50%, -50%) scale(1);
+        z-index: 0;
       }
     }
 
@@ -428,7 +429,7 @@
       <!-- 電視的屏幕部分 -->
       <div class="screen">
         <div class="page">
-          <button onclick="show3D()">進入 3D 場景</button>
+          <button onclick="show3D()" style="z-index: 11;">進入 3D 場景</button>
         </div>
         <div class="page">Page 2</div>
         <div class="page">Page 3</div>

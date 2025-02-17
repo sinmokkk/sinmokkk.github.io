@@ -35,7 +35,7 @@
         inset 0 0 30px rgba(255, 255, 255, 0.1);
       backdrop-filter: blur(10px);
       position: relative;
-      display: flex;
+      display: none;
       justify-content: center;
       align-items: center;
       overflow: hidden;
@@ -475,6 +475,33 @@
         font-size: 10vw;
       }
     }
+
+    /* 影片層 */
+    .video-layer {
+      width: 650px;
+      height: 400px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 1rem;
+      box-shadow:
+        0 4px 10px rgba(0, 0, 0, 0.7),
+        inset 0 0 30px rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      z-index: 1001; /* 確保在最上層 */
+      display: none; /* 預設隱藏 */
+    }
+
+    .video-layer video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* 讓影片填滿畫面 */
+    }
+
   </style>
 </head>
 <body>
@@ -485,10 +512,11 @@
   </div>
 
   <!-- 雜訊層 -->
-  <div class="static-noise">
-    <div class="logo-box">
+  <div class="static-noise"></div>
+
+      <!-- <div class="logo-box"> -->
       <!-- 1 -->
-      <div class="logo-team"  data-audio="./audio/check.mp3">
+      <!-- <div class="logo-team"  data-audio="./audio/check.mp3">
         <div class="logo">
           <svg style="display: flex; justify-content: left;" width="100%" height="160px" viewBox="0 0 600 160" preserveAspectRatio="xMidYMid meet">
             <text 
@@ -521,7 +549,7 @@
             </text>
           </svg>
         </div>
-      </div>
+      </div> -->
       <!-- 2 -->
       <!-- <div class="logo-team" data-audio="./audio/check.mp3">
         <div class="logo">
@@ -557,13 +585,18 @@
           </svg>
         </div>
       </div> -->
-    </div>
-  </div>
+    <!-- </div> -->
 
   <!-- 螢光字 -->
   <div class="nmixx-text">NMIXX</div>
 
   <div class="ocean">
+    <div class="video-layer">
+        <!-- 影片層 -->
+          <video id="background-video" autoplay>
+            <source src="./audio/wemo_check.mp4" type="video/mp4">
+          </video>
+    </div>
     <div class="contain">
       <!-- 電視的屏幕部分 -->
       <div class="screen">
@@ -640,9 +673,11 @@
     const logoTeamElements = document.querySelectorAll(".logo-team");
     const staticNoise = document.querySelector(".static-noise");
     const nmixxText = document.querySelector(".nmixx-text");
+    const video = document.getElementById("background-video");
+    const videoLayer = document.querySelector(".video-layer");
     
     let totalDelay = 2; // 定義總延遲時間
-    let totalLogoTime = logoTeamElements.length * 1000; // 計算總 logo-team 的動畫時間
+    let totalLogoTime = 2; // 計算總 logo-team 的動畫時間
     let fadeOutDelay = totalLogoTime + totalDelay * 1000; // 設定 fade-out 時間
     let nmixxTextDelay = 2000 + fadeOutDelay + 1000; // 設定 nmixx-text 出現時間
 
@@ -656,37 +691,27 @@
         const overlay = document.getElementById("click-overlay");
         overlay.style.display = "none";
 
-        // 讓瀏覽器允許播放音效
-        const silentAudio = new Audio();
-        silentAudio.play().catch(() => {});
-
-        // 綁定 .logo-team 動畫與音效
-        logoTeamElements.forEach((logoTeam, index) => {
-            const audioSrc = logoTeam.getAttribute("data-audio");
-            if (audioSrc) {
-                const audio = new Audio(audioSrc);
-                logoTeam.audio = audio; // 儲存音效以便播放
-            }
-
+        // 顯示並播放影片
+        videoLayer.style.display = "flex";
+        video.play().then(() => {
+            const videoDuration = video.duration * 1000; // 轉換為毫秒
+            const additionalDelay = 1000; // 額外延遲 1 秒
+            const totalDelay = videoDuration + additionalDelay;
+            
+            // 雜訊動畫
+            staticNoise.classList.remove("fade-out");
             setTimeout(() => {
-                logoTeam.classList.add("active"); // 啟動動畫
-                if (logoTeam.audio) {
-                    logoTeam.audio.play().catch(error => console.error("🔇 無法播放音效:", error));
-                }
-            }, index * 1000); // 每個 logo 延遲 1 秒播放
+                videoLayer.style.display = "none";
+                document.querySelector(".contain").style.display = "flex";
+                staticNoise.classList.add("fade-out");
+            }, totalDelay);
+            // NMIXX 文字
+            setTimeout(() => {
+                nmixxText.classList.add("textEffect");
+            }, totalDelay + 1000);
+        }).catch(error => {
+            console.error("影片播放失敗:", error);
         });
-
-        // 啟動雜訊動畫
-        staticNoise.classList.remove("fade-out");
-        // 延遲讓雜訊動畫淡出，確保在所有動畫結束後
-        setTimeout(() => {
-            staticNoise.classList.add("fade-out");
-        }, fadeOutDelay);
-
-        // 延遲讓 nmixxText 出現
-        setTimeout(() => {
-            nmixxText.classList.add("textEffect"); // 確保 CSS 設置了 .visible 來顯示元素
-        }, nmixxTextDelay);
     });
 });
 

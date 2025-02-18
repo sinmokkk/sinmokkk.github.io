@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NMIXX</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: linear-gradient(to bottom, #0050a1, #001933);
+    }
+
+    .ocean {
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+      background: radial-gradient(circle, #00bfff, #0099cc 60%, #004c99 100%);
+    }
+
+    .contain {
+      gap: 15px;
+      z-index: 10;
+      width: 650px;
+      height: 400px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 1rem;
+      box-shadow:
+        0 4px 10px rgba(0, 0, 0, 0.7),
+        inset 0 0 30px rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .scene {
+      z-index: 10;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 1rem;
+      box-shadow:
+        0 4px 10px rgba(0, 0, 0, 0.7),
+        inset 0 0 30px rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      position: relative;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 1.2rem;
+      margin: 10px;
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+      background: #0050a1;
+      color: white;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #003d80;
+    }
+
+    button:active {
+      background: #002b60;
+    }
+
+    .screen {
+      width: 95%;
+      height: 85%;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 0.75rem;
+      overflow: hidden;
+      position: relative;
+      box-shadow:
+        inset 0 0 10px rgba(255, 255, 255, 0.3),
+        inset 0 0 30px rgba(0, 0, 0, 0.7);
+      display: flex;
+      flex-direction: row;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory; /* 啟用強制對齊 */
+      scrollbar-width: none; /* 隱藏滾動條 */
+    }
+
+    .screen::-webkit-scrollbar {
+      display: none; /* 隱藏滾動條 */
+    }
+
+    .page {
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.2));
+      border-radius: 0.75rem;
+      flex: 0 0 100%;
+      width: 100%;
+      height: 100%;
+      scroll-snap-align: start; /* 對齊到容器的起始點 */
+      text-align: center;
+      color: #fff;
+      font-size: 2rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* 雜訊層 */
+    .static-noise {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: black;
+      z-index: 1000;
+      pointer-events: none;
+      animation: noise 0.15s infinite, colorShift 1.5s infinite alternate;
+    }
+
+    @keyframes noise {
+      0%, 100% {
+        background: repeating-linear-gradient(
+          0deg,
+          rgba(0, 0, 0, 0.9) 0px,
+          rgba(255, 255, 255, 0.08) 2px,
+          rgba(0, 0, 0, 0.9) 4px
+        );
+      }
+      50% {
+        background: repeating-linear-gradient(
+          90deg,
+          rgba(0, 0, 0, 0.9) 0px,
+          rgba(255, 255, 255, 0.1) 3px,
+          rgba(0, 0, 0, 0.9) 6px
+        );
+      }
+    }
+
+    @keyframes colorShift {
+      0% {
+        filter: hue-rotate(0deg);
+      }
+      100% {
+        filter: hue-rotate(20deg);
+      }
+    }
+
+    /* 定義 fadeIn 動畫 */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .logo-box {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+    }
+
+    .logo {
+      position: relative;
+      display: flex;
+      justify-content: center;
+    }
+    .logo-team {
+      opacity: 0; /* 預設隱藏 */
+      transform: translateY(20px);
+      transition: opacity 1s ease-out, transform 1s ease-out;
+    }
+
+    .logo-team.active {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* 讓 SVG 文字動畫可以重複觸發 */
+    .text {
+        stroke-dasharray: 900;
+        stroke-dashoffset: 900;
+        transition: stroke-dashoffset 3s ease-out;
+    }
+
+    .logo-team.active .text {
+        stroke-dashoffset: 0;
+    }
+
+
+    @keyframes text-animation {
+      75% {
+        fill: transparent;
+        stroke-dashoffset: 0;
+        stroke-width: 5px;
+      }
+      100% {
+        fill: #F3F3F3;
+        stroke-dashoffset: 0;
+        stroke-width: 0;
+      }
+    }
+
+    /* 淡出效果 */
+    .fade-out {
+      animation: fadeOut 1.2s forwards;
+    }
+
+    @keyframes fadeOut {
+      to {
+        opacity: 0;
+        visibility: hidden;
+      }
+    }
+
+    /* 螢光字效果 */
+    .nmixx-text {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(1);
+      color: #00ccff;
+      font-size: 5rem;
+      font-weight: bold;
+      text-shadow: 
+        0 0 10px #00ccff, 
+        0 0 20px #00ccff, 
+        0 0 30px #00ccff,
+        0 0 40px #00ffff;
+      opacity: 0;
+      z-index: 1000;
+      animation: textEffect 2.5s forwards 5s;
+    }
+
+    @keyframes textEffect {
+      0% {
+        opacity: 0;
+        text-shadow: 0 0 10px #00ccff;
+        transform: translate(-50%, -50%) scale(0.8);
+      }
+      50% {
+        opacity: 1;
+        text-shadow: 0 0 30px #00ccff, 0 0 60px #00ffff;
+        transform: translate(-50%, -50%) scale(1.2);
+      }
+      100% {
+        text-shadow: 0 0 10px #00ccff, 0 0 20px #00ffff;
+        transform: translate(-50%, -50%) scale(1);
+        z-index: 0;
+      }
+    }
+
+    .bubble {
+      position: absolute;
+      bottom: -100px;
+      width: 40px;
+      height: 40px;
+      background: radial-gradient(circle at 30% 30%, rgba(0, 240, 255, 0.8), rgba(0, 180, 255, 0.6) 40%, rgba(0, 150, 255, 0.3) 70%);
+      border-radius: 50%;
+      box-shadow: 
+        0 0 30px 10px rgba(0, 220, 255, 0.8), 
+        inset -10px -10px 20px rgba(0, 240, 255, 0.9), 
+        inset 10px 10px 25px rgba(0, 100, 200, 0.4);
+      animation: rise 8s infinite ease-in-out, shine 3s infinite alternate;
+      opacity: 0.9;
+    }
+
+    @keyframes rise {
+      0% {
+        transform: translateY(0) scale(0.8);
+      }
+      100% {
+        transform: translateY(-120vh) scale(1.2);
+      }
+    }
+
+    @keyframes shine {
+      0% {
+        filter: brightness(1);
+      }
+      100% {
+        filter: brightness(1.4);
+      }
+    }
+
+    #click-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: black;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+    }
+
+    /* 霓虹燈文字動畫 */
+    @keyframes neon-glow {
+        0% { text-shadow: 0 0 5px #ff00ff, 0 0 10px #ff00ff, 0 0 20px #ff00ff; }
+        50% { text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 40px #00ffff; }
+        100% { text-shadow: 0 0 5px #ff00ff, 0 0 10px #ff00ff, 0 0 20px #ff00ff; }
+    }
+
+    @keyframes light-sweep {
+        0% { background-position: -200%; }
+        100% { background-position: 200%; }
+    }
+            
+    /* 文字變色動畫 */
+    @keyframes neon-flow {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+    }
+
+    /* 霓虹燈文字 */
+    #neon-text {
+        font-size: 3rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        text-align: center;
+        position: relative;
+        display: inline-block;
+        padding: 10px 20px;
+        background-image: linear-gradient(90deg, #ff00ff, #00ffff, #ff00ff);
+        background-size: 200% 100%;
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+        animation: neon-flow 3s infinite linear;
+    }
+
+    /* 光掃過動畫 */
+    @keyframes light-sweep {
+        0% { left: -150%; opacity: 0.2; }
+        20% { opacity: 0.6; }
+        50% { left: 100%; opacity: 0.8; }
+        80% { opacity: 0.6; }
+        100% { left: 150%; opacity: 0; }
+    }
+
+    #neon-text::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -150%;
+        width: 120%;
+        height: 100%;
+        background: linear-gradient(100deg, transparent 20%, rgba(255, 255, 255, 0.9) 50%, transparent 80%);
+        transform: skewX(-25deg);
+        animation: light-sweep 3s infinite ease-in-out;
+    }
+
+    /* 霓虹按鈕動畫 */
+    @keyframes neon-button-glow {
+        0% { box-shadow: 0 0 5px #ff00ff, 0 0 10px #ff00ff; }
+        50% { box-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff; }
+        100% { box-shadow: 0 0 5px #ff00ff, 0 0 10px #ff00ff; }
+    }
+
+    /* 霓虹按鈕樣式 */
+    #start-button {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: white;
+        background-color: black;
+        border: 2px solid #ff00ff;
+        padding: 10px 20px;
+        cursor: pointer;
+        text-transform: uppercase;
+        position: relative;
+        overflow: hidden;
+        transition: 0.3s ease-in-out;
+        animation: neon-button-glow 1.5s infinite alternate;
+    }
+
+    /* 霓虹按鈕光掃過 */
+    #start-button::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+        transform: skewX(-20deg);
+        animation: light-sweep 3s infinite linear;
+    }
+
+    /* 按鈕 hover 效果 */
+    #start-button:hover {
+        color: #00ffff;
+        border-color: #00ffff;
+        transform: scale(1.1);
+    }
+
+    /* 影片層 */
+    .video-layer {
+      width: 650px;
+      height: 400px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 1rem;
+      box-shadow:
+        0 4px 10px rgba(0, 0, 0, 0.7),
+        inset 0 0 30px rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      z-index: 1001; /* 確保在最上層 */
+      display: none; /* 預設隱藏 */
+    }
+
+    .video-layer video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* 讓影片填滿畫面 */
+    }
+
+    #jiwoo {
+        position: absolute;
+        width: 100px; /* 調整圖片大小 */
+        height: auto;
+        transition: transform 0.1s linear; /* 使移動更流暢 */
+        pointer-events: none; /* 避免影響滑鼠事件 */
+    }
+
+    .pagination {
+        position: relative;
+        display: flex;
+        flex-direction: row;
+        --ddim: 10px;
+        --rd: 15px;
+        --rdim: calc(var(--rd)*2);
+        --pm: #ffff03;
+    }
+
+    label {
+        content: '';
+        margin: 0 10px;
+        height: var(--ddim);
+        width: var(--ddim);
+        background: #f7b997;
+        cursor: pointer;
+    }
+
+    label:first-child {margin-left: 0;}
+    label:last-child {margin-right: 0;}
+    input {display: none;}
+
+    .pacman {
+        content: '';
+        position: absolute;
+        top: calc(-1*var(--ddim));
+        left: calc(-1*var(--ddim)/2);
+        height: var(--rdim);
+        width: var(--rdim);
+        transition: transform 250ms linear;
+    }
+
+    .pacman:before,
+    .pacman:after {
+        content: '';
+        position: absolute;
+        height: var(--rd);
+        width: var(--rdim);
+        left: 0;
+        background: var(--pm);
+        transition: inherit;
+    }
+
+    .pacman:before {
+        top: 0;
+        border-top-left-radius: var(--rdim);
+        border-top-right-radius: var(--rdim);
+        transform-origin: bottom center;
+        transform: rotate(-45deg);
+    }
+
+    .pacman:after {
+        bottom: 0;
+        border-bottom-left-radius: var(--rdim);
+        border-bottom-right-radius: var(--rdim);
+        transform-origin: top center;
+        transform: rotate(45deg);
+    }
+
+    @keyframes waka {
+        0% {}
+        50% {transform: rotate(0);}
+        100% {}
+    }
+
+  .pacman.waka:before,
+  .pacman.waka:after {
+    animation: waka 0.5s infinite;
+  }
+
+    input[type="radio"]:hover ~ .pacman:before,
+    input[type="radio"]:hover ~ .pacman:after {
+        animation: waka 500ms infinite;
+    }
+
+    input[id="dot-1"]:checked ~ .pacman {transform: translateX(var(--ddim));}
+    input[id="dot-2"]:checked ~ .pacman {transform: translateX(calc(var(--ddim) + var(--rdim)));}
+    input[id="dot-3"]:checked ~ .pacman {transform: translateX(calc(var(--ddim) + var(--rdim)*2));}
+    input[id="dot-4"]:checked ~ .pacman {transform: translateX(calc(var(--ddim) + var(--rdim)*3));}
+    input[id="dot-5"]:checked ~ .pacman {transform: translateX(calc(var(--ddim) + var(--rdim)*4));}
+    input[id="dot-6"]:checked ~ .pacman {transform: translateX(calc(var(--ddim) + var(--rdim)*5));}
+  </style>
+</head>
+<body>
+
+  <div class="ocean">
+    <div class="contain">
+      <!-- 電視的屏幕部分 -->
+      <div class="screen">
+        <div class="page">
+          <img id="jiwoo" src="./audio/jiwoo.jpg" alt="jiwoo">
+        </div>
+        <script>
+          const jiwoo = document.getElementById("jiwoo");
+          const page = document.querySelector(".page");
+  
+          document.addEventListener("mousemove", (event) => {
+              const pageRect = page.getBoundingClientRect();
+              const jiwooWidth = jiwoo.offsetWidth;
+              const jiwooHeight = jiwoo.offsetHeight;
+  
+              // 取得滑鼠座標
+              let x = event.clientX;
+              let y = event.clientY;
+  
+              // 確保滑鼠在 page 內
+              if (x >= pageRect.left && x <= pageRect.right &&
+                  y >= pageRect.top && y <= pageRect.bottom) {
+  
+                  // 讓 jiwoo 的**中心點**對齊滑鼠
+                  const newX = x - pageRect.left - (jiwooWidth + page.offsetWidth ) / 2;
+                  const newY = y - pageRect.top - (jiwooHeight + page.offsetHeight) / 2;
+  
+                  jiwoo.style.transform = `translate(${newX}px, ${newY}px)`;
+              }
+          });
+      </script>
+        <div class="page">Page 2</div>
+        <div class="page">Page 3</div>
+        <div class="page">Page 4</div>
+        <div class="page">Page 5</div>
+        <div class="page">Page 6</div>
+      </div>
+        <div class="pagination">
+            <input id="dot-1" type="radio" name="dots" checked>
+            <label for="dot-1"  onclick="scrollToPage(0)"></label>
+            <input id="dot-2" type="radio" name="dots">
+            <label for="dot-2"  onclick="scrollToPage(1)"></label>
+            <input id="dot-3" type="radio" name="dots">
+            <label for="dot-3"  onclick="scrollToPage(2)"></label>
+            <input id="dot-4" type="radio" name="dots">
+            <label for="dot-4"  onclick="scrollToPage(3)"></label>
+            <input id="dot-5" type="radio" name="dots">
+            <label for="dot-5"  onclick="scrollToPage(4)"></label>
+            <input id="dot-6" type="radio" name="dots">
+            <label for="dot-6"  onclick="scrollToPage(5)"></label>
+            <div class="pacman"></div>
+        </div>
+        <script>
+            const screen = document.querySelector(".screen");
+            const pages = document.querySelectorAll(".page");
+            const radioInputs = document.querySelectorAll(".pagination input");
+            const pacman = document.querySelector(".pacman");
+            const labels = document.querySelectorAll(".pagination label");
+
+            let isScrolling = false; // 防止連續觸發 IntersectionObserver
+
+            function scrollToPage(index) {
+                isScrolling = true; // 阻止 IntersectionObserver 立即更新
+                const scrollLeft = pages[index].offsetLeft;
+                
+                screen.scrollTo({
+                left: scrollLeft,
+                behavior: "smooth"
+                });
+
+                updatePacmanPosition(index);
+
+                setTimeout(() => {
+                isScrolling = false; // 0.6 秒後重新開啟監聽（與 scrollTo() 動畫同步）
+                }, 600);
+            }
+
+            function updatePacmanPosition(index) {
+                const label = labels[index];
+                const offsetLeft = label.offsetLeft;
+                pacman.style.transform = `translateX(${offsetLeft}px)`;
+                pacman.classList.add("waka");
+
+                setTimeout(() => {
+                pacman.classList.remove("waka");
+                }, 1000);
+            }
+
+            // 使用 IntersectionObserver 監聽當前頁面
+            const observer = new IntersectionObserver(
+                (entries) => {
+                if (isScrolling) return; // **避免 scrollTo() 影響**
+                
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                    const index = Array.from(pages).indexOf(entry.target);
+                    if (index !== -1) {
+                        radioInputs[index].checked = true;
+                        updatePacmanPosition(index);
+                    }
+                    }
+                });
+                },
+                { root: screen, threshold: 0.8 } // 80% 以上可見時才觸發
+            );
+
+            // 監聽所有 .page
+            pages.forEach((page) => observer.observe(page));
+        </script>
+    </div>
+  </div>
+
+</body>
+</html>

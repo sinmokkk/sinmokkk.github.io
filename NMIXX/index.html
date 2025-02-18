@@ -482,6 +482,14 @@
       object-fit: cover; /* 讓影片填滿畫面 */
     }
 
+    #jiwoo {
+        position: absolute;
+        width: 100px; /* 調整圖片大小 */
+        height: auto;
+        transition: transform 0.1s linear; /* 使移動更流暢 */
+        pointer-events: none; /* 避免影響滑鼠事件 */
+    }
+
   </style>
 </head>
 <body>
@@ -580,7 +588,36 @@
     <div class="contain">
       <!-- 電視的屏幕部分 -->
       <div class="screen">
-        <div class="page">Page 1</div>
+        <div class="page">
+          <img id="jiwoo" src="./audio/jiwoo.jpg" alt="jiwoo">
+        </div>
+        <script>
+          const jiwoo = document.getElementById("jiwoo");
+          const page = document.querySelector(".page");
+  
+          document.addEventListener("mousemove", (event) => {
+              const pageRect = page.getBoundingClientRect();
+              const jiwooWidth = jiwoo.offsetWidth;
+              const jiwooHeight = jiwoo.offsetHeight;
+  
+              // 取得滑鼠座標
+              let x = event.clientX;
+              let y = event.clientY;
+  
+              // 確保滑鼠在 page 內
+              if (x >= pageRect.left && x <= pageRect.right &&
+                  y >= pageRect.top && y <= pageRect.bottom) {
+  
+                  // 讓 jiwoo 的**中心點**對齊滑鼠
+                  const newX = x - pageRect.right - jiwooWidth / 2;
+                  const newY = y - pageRect.bottom - jiwooHeight / 2;
+  
+                  jiwoo.style.transform = `translate(${newX}px, ${newY}px)`;
+              }
+          });
+      </script>
+
+        
         <div class="page">Page 2</div>
         <div class="page">Page 3</div>
       </div>

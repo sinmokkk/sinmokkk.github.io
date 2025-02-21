@@ -530,6 +530,148 @@
     input[id="dot-4"]:checked ~ .pacman {transform: translateX(calc(var(--ddim) + var(--rdim)*3));}
     input[id="dot-5"]:checked ~ .pacman {transform: translateX(calc(var(--ddim) + var(--rdim)*4));}
     input[id="dot-6"]:checked ~ .pacman {transform: translateX(calc(var(--ddim) + var(--rdim)*5));}
+  
+/* 遊戲容器樣式 */
+.game {
+    width: 90%;
+    height: 70%;
+    border: none;
+    margin: 20px auto;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(to right, #000428, #004e92);
+    border-radius: 15px;
+    box-shadow: 
+        0 0 20px rgba(0, 78, 146, 0.5),
+        inset 0 0 50px rgba(0, 4, 40, 0.3);
+}
+
+/* 遊戲背景動畫 */
+@keyframes parallax {
+    from { background-position: 0 0; }
+    to { background-position: -600px 0; }
+}
+
+.game::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        linear-gradient(transparent 50%, rgba(0, 0, 0, 0.5)),
+        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2 2"><circle cx="1" cy="1" r="0.5" fill="rgba(255,255,255,0.1)"/></svg>');
+    background-size: 100% 100%, 20px 20px;
+    animation: parallax 20s linear infinite;
+    opacity: 0.3;
+}
+
+/* 角色樣式 */
+#idol {
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    bottom: 0;
+    left: 50px;
+    transition: transform 0.2s;
+    background: url('./audio/jiwoo.jpg'); /* 改成您的角色圖片路徑 */
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+}
+
+/* 障礙物樣式 */
+.obstacle {
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: url('./audio/jiwoo.jpg'); /* 改成您的障礙物圖片路徑 */
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    animation: float 1s infinite ease-in-out alternate;
+    filter: drop-shadow(0 0 8px rgba(255, 0, 0, 0.4));
+}
+
+@keyframes float {
+    from { transform: translateY(0); }
+    to { transform: translateY(-5px); }
+}
+
+/* 分數顯示 */
+.score {
+    font-size: 24px;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
+}
+
+/* 遊戲結束畫面 */
+.game-over {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    padding: 30px 50px;
+    border-radius: 15px;
+    color: #fff;
+    font-size: 28px;
+    text-align: center;
+    box-shadow: 
+        0 0 20px rgba(255, 255, 255, 0.2),
+        inset 0 0 15px rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translate(-50%, -60%); }
+    to { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+/* 開始畫面樣式 */
+#startScreen {
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
+}
+
+#startScreen h1 {
+    color: #fff;
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+}
+
+#startButton {
+    padding: 15px 40px;
+    font-size: 1.4rem;
+    background: linear-gradient(45deg, #0050a1, #00a1ff);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 20px rgba(0, 161, 255, 0.4);
+}
+
+#startButton:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(0, 161, 255, 0.6);
+}
+
+#startButton:active {
+    transform: scale(0.98);
+}
   </style>
 </head>
 <body>
@@ -538,10 +680,158 @@
     <div class="contain">
       <!-- 電視的屏幕部分 -->
       <div class="screen">
-        <div class="page">
-          <img id="jiwoo" src="./audio/jiwoo.jpg" alt="jiwoo">
+        <div class="page" style="flex-direction: column;">
+          <div class="score">分數: <span id="scoreEl">0</span></div>
+          <div class="game" id="game">
+            <div id="startScreen" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100;">
+              <h1 style="color: white; font-size: 2rem; margin-bottom: 20px;">NMIXX 跑酷遊戲</h1>
+              <button id="startButton" style="padding: 15px 30px; font-size: 1.2rem; background: #0050a1; color: white; border: none; border-radius: 5px; cursor: pointer; transition: transform 0.2s;">
+                  開始遊戲
+              </button>
+          </div>
+            <div id="idol"></div>
+            <div class="game-over" id="gameOver">
+                遊戲結束!<br>按空白鍵或點擊<br>即可重新開始
+            </div>
         </div>
+    
+        <audio id="jumpSound" src="jump.mp3"></audio>
+        <audio id="hitSound" src="hit.mp3"></audio>
+    
         <script>
+            const idol = document.getElementById('idol');
+            const game = document.getElementById('game');
+            const gameOver = document.getElementById('gameOver');
+            const scoreEl = document.getElementById('scoreEl');
+            const jumpSound = document.getElementById('jumpSound');
+            const hitSound = document.getElementById('hitSound');
+            const startScreen = document.getElementById('startScreen');
+            const startButton = document.getElementById('startButton');
+            
+            let gameStarted = false;
+            let isJumping = false;
+            let isGameOver = false;
+            let score = 0;
+            let gameSpeed = 10; // 初始障礙物移動速度
+            let gameInterval;
+    
+            startButton.addEventListener('click', () => {
+                gameStarted = true;
+                startScreen.style.display = 'none';
+                createObstacle();
+                gameInterval = setInterval(() => {
+                    gameSpeed += 0.1;
+                }, 1000);
+            });
+
+            function jump() {
+              if (!gameStarted || isJumping || isGameOver) return; 
+                isJumping = true;
+                jumpSound.play();
+                let jumpHeight = 130;
+                let jumpDuration = 500;
+                let startTime = Date.now();
+    
+                function animateJump() {
+                    let elapsedTime = Date.now() - startTime;
+                    let progress = elapsedTime / jumpDuration;
+                    if (progress < 1) {
+                        let height = Math.sin(progress * Math.PI) * jumpHeight;
+                        idol.style.bottom = height + "px";
+                        requestAnimationFrame(animateJump);
+                    } else {
+                        idol.style.bottom = "0px";
+                        isJumping = false;
+                    }
+                }
+                requestAnimationFrame(animateJump);
+            }
+    
+            document.addEventListener("keydown", (e) => {
+                if (e.code === "Space") {
+                    if (isGameOver) restartGame();
+                    else jump();
+                }
+            });
+
+            gameOver.addEventListener("click", restartGame); // 點擊遊戲結束畫面重新開始
+    
+            game.addEventListener("click", jump);
+    
+            function createObstacle() {
+              if (!gameStarted || isGameOver) return;
+
+              // 確保畫面上最多只有 1 個障礙物
+              const existingObstacles = document.querySelectorAll('.obstacle');
+              if (existingObstacles.length > 0) {
+                  setTimeout(createObstacle, 1000); // 如果已有障礙物，延遲 1 秒後再嘗試生成
+                  return;
+              }
+
+              const obstacle = document.createElement("div");
+              obstacle.classList.add("obstacle");
+              game.appendChild(obstacle);
+
+              let position = 600;
+              obstacle.style.left = position + "px";
+
+              let moveInterval = setInterval(() => {
+                  if (isGameOver) {
+                      clearInterval(moveInterval);
+                      return;
+                  }
+
+                  position -= gameSpeed;
+                  obstacle.style.left = position + "px";
+
+                  let idolRect = idol.getBoundingClientRect();
+                  let obstacleRect = obstacle.getBoundingClientRect();
+
+                  if (
+                      idolRect.right > obstacleRect.left &&
+                      idolRect.left < obstacleRect.right &&
+                      idolRect.bottom > obstacleRect.top
+                  ) {
+                      clearInterval(moveInterval);
+                      gameOver.style.display = "block";
+                      isGameOver = true;
+                      hitSound.play();
+                      clearInterval(gameInterval);
+                      return;
+                  }
+
+                  if (position < -40) {
+                      clearInterval(moveInterval);
+                      obstacle.remove();
+                      if (!isGameOver) {
+                          score += 10;
+                          scoreEl.textContent = score;
+                      }
+                  }
+              }, 20);
+
+              let nextObstacleTime = Math.random() * 100 + 1000;
+              if (!isGameOver) setTimeout(createObstacle, nextObstacleTime);
+          }
+
+    
+          function restartGame() {
+            document.querySelectorAll(".obstacle").forEach((o) => o.remove());
+            isGameOver = false;
+            gameStarted = true;
+            score = 0;
+            scoreEl.textContent = "0";
+            gameOver.style.display = "none";
+            startScreen.style.display = "none";
+            gameSpeed = 10;
+            createObstacle();
+            gameInterval = setInterval(() => {
+                gameSpeed += 0.1;
+            }, 1000);
+        }
+        </script>
+        </div>
+        <!-- <script>
           const jiwoo = document.getElementById("jiwoo");
           const page = document.querySelector(".page");
   
@@ -565,7 +855,7 @@
                   jiwoo.style.transform = `translate(${newX}px, ${newY}px)`;
               }
           });
-      </script>
+      </script> -->
         <div class="page">Page 2</div>
         <div class="page">Page 3</div>
         <div class="page">Page 4</div>
